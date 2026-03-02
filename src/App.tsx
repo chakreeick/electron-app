@@ -1,11 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
-
+  useEffect(() => {
+    window.api.onLog((msg) => {
+      console.log(msg)
+    })
+    window.api.checkUpdate()
+  }, [])
   return (
     <>
       <div className='flex-row justify-center'>

@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require("electron")
+const { app, BrowserWindow, globalShortcut } = require("electron")
 const { ipcMain } = require("electron")
 const { autoUpdater } = require("electron-updater")
 const path = require("path")
@@ -6,21 +6,25 @@ const path = require("path")
 autoUpdater.autoDownload = false
 
 function setupUpdater(win) {
-  ipcMain.handle("update:check", () => autoUpdater.checkForUpdates())
-  ipcMain.handle("update:download", () => autoUpdater.downloadUpdate())
-  ipcMain.handle("update:install", () => autoUpdater.quitAndInstall())
+  ipcMain.handle("update:check", async() => {
+    await autoUpdater.checkForUpdates();
+  })
 
-  autoUpdater.on("checking-for-update", () => console.log("[updater] checking..."))
-  autoUpdater.on("update-available", (info) => console.log("[updater] available:", info.version))
-  autoUpdater.on("update-not-available", (info) => console.log("[updater] none:", info?.version))
-  autoUpdater.on("download-progress", (p) => console.log("[updater] progress:", Math.round(p.percent)))
-  autoUpdater.on("update-downloaded", (info) => console.log("[updater] downloaded:", info.version))
-  autoUpdater.on("error", (e) => console.log("[updater] error:", e))
-  // autoUpdater.on("update-available", () => win.webContents.send("update:available"))
-  // autoUpdater.on("update-not-available", () => win.webContents.send("update:none"))
-  // autoUpdater.on("download-progress", (p) => win.webContents.send("update:progress", p))
-  // autoUpdater.on("update-downloaded", () => win.webContents.send("update:downloaded"))
-  // autoUpdater.on("error", (e) => win.webContents.send("update:error", String(e)))
+  autoUpdater.on("checking-for-update", () => {
+    win.webContents.send("log", "[updater] checking...")
+  })
+
+  autoUpdater.on("update-available", (info) => {
+    win.webContents.send("log", `[updater] available: ${info.version}`)
+  })
+
+  autoUpdater.on("update-not-available", () => {
+    win.webContents.send("log", "[updater] none")
+  })
+
+  autoUpdater.on("error", (e) => {
+    win.webContents.send("log", `[updater] error: ${e}`)
+  })
 }
 
 function createWindow() {
@@ -28,7 +32,9 @@ function createWindow() {
     width: 1024,
     height: 768,
     webPreferences: {
-      preload: path.join(__dirname, "preload.cjs")
+      preload: path.join(__dirname, "preload.cjs"),
+      contextIsolation: true,
+      nodeIntegration: false
     }
   })
 
@@ -40,7 +46,16 @@ function createWindow() {
   } else {
     win.loadFile(path.join(__dirname, "..", "dist", "index.html"));
   }
+  globalShortcut.register("F12", () => {
+    if (win.isDestroyed()) return
+    win.webContents.toggleDevTools()
+  })
 
+  // ✅ และเพิ่ม shortcut แบบ Chrome: Cmd+Option+I
+  globalShortcut.register("CommandOrControl+Alt+I", () => {
+    if (win.isDestroyed()) return
+    win.webContents.toggleDevTools()
+  })
 }
 
 app.whenReady().then(createWindow)
