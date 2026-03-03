@@ -17,7 +17,7 @@ function App() {
     window.api.onUpdateAvailable((v) => {
       setIsDownload({
         loading : false,
-        updateAvailable : v === version,
+        updateAvailable : v != version,
         alreadyDownload : false
       })
     })
@@ -54,10 +54,10 @@ function App() {
           <>
             {
               isDownload.updateAvailable ?
-              <p className='text-white'>This version is latest.</p> : 
               <button onClick={() => window.api.downloadUpdate()} className='bg-orange-500 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-700 text-white font-bold py-2 px-4 rounded'>
                 Download
-              </button>
+              </button>:
+              <p className='text-white'>This version is latest.</p>
             }
           </>
         }
