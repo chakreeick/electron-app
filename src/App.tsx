@@ -1,38 +1,21 @@
-import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect } from 'react'
+import packageJson from "./../package.json"
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const {version} = packageJson;
   useEffect(() => {
-    window.api.onLog((msg) => {
-      console.log(msg)
+    window.api.onUpdateAvailable((v) => {
+      console.log(v)
     })
     window.api.checkUpdate()
   }, [])
   return (
     <>
       <div className='flex-row justify-center'>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h1 className='text-white'>Kiosk Project</h1>
+        <p className='text-orange-500'>version {version}</p>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
