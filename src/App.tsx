@@ -32,6 +32,10 @@ function App() {
     })
 
     window.api.onUpdateNone(() => {
+      setIsDownload({
+        ...isDownload,
+        loading : false
+      })
       console.log("No update")
     })
   }, [])
@@ -44,14 +48,14 @@ function App() {
         <h1 className='text-white'>Kiosk Project</h1>
         <p className='text-orange-500'>version {version}</p>
         {
-          isDownload.alreadyDownload ? <button onClick={() => window.api.installUpdate()} className='bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded'>
+          isDownload.alreadyDownload ? <button onClick={() => window.api.installUpdate()} className='bg-orange-500 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-700 text-white font-bold py-2 px-4 rounded'>
                 Install & Restart
               </button> : 
           <>
             {
               isDownload.updateAvailable ?
               <p className='text-white'>This version is latest.</p> : 
-              <button onClick={() => window.api.downloadUpdate()} className='bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded'>
+              <button onClick={() => window.api.downloadUpdate()} className='bg-orange-500 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-700 text-white font-bold py-2 px-4 rounded'>
                 Download
               </button>
             }
