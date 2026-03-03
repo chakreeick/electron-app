@@ -10,21 +10,38 @@ function setupUpdater(win) {
     await autoUpdater.checkForUpdates();
   })
 
+  ipcMain.handle("update:download", () => {
+    return autoUpdater.downloadUpdate()
+  })
+
+  ipcMain.handle("update:install", () => {
+    autoUpdater.quitAndInstall()
+  })
+
   autoUpdater.on("checking-for-update", () => {
-    win.webContents.send("log", "[updater] checking...")
+    win.webContents.send("update:status", "checking")
   })
 
   autoUpdater.on("update-available", (info) => {
-    win.webContents.send("log", `[updater] available: ${info.version}`)
+    win.webContents.send("update:available", info.version)
   })
 
   autoUpdater.on("update-not-available", () => {
-    win.webContents.send("log", "[updater] none")
+    win.webContents.send("update:none")
+  })
+
+  autoUpdater.on("download-progress", (p) => {
+    win.webContents.send("update:progress", Math.round(p.percent))
+  })
+
+  autoUpdater.on("update-downloaded", () => {
+    win.webContents.send("update:downloaded")
   })
 
   autoUpdater.on("error", (e) => {
-    win.webContents.send("log", `[updater] error: ${e}`)
+    win.webContents.send("update:error", String(e))
   })
+
 }
 
 function createWindow() {
