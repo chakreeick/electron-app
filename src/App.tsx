@@ -4,63 +4,53 @@ import './App.css'
 
 function App() {
   const {version} = packageJson;
-  const [isDownload,setIsDownload] = useState({
-    loading : true,
-    updateAvailable : false,
-    alreadyDownload : false
-  })
+  const [status, setStatus] = useState<"idle" | "available" | "downloading" | "downloaded">("idle")
+  const [progress, setProgress] = useState(0)
+  const [ver, setVer] = useState(version)
   useEffect(() => {
     window.api.onLog((msg) => {
       console.log(msg)
     })
     window.api.checkUpdate()
     window.api.onUpdateAvailable((v) => {
-      setIsDownload({
-        loading : false,
-        updateAvailable : v != version,
-        alreadyDownload : false
-      })
+      setVer(v)
+      setStatus("available")
     })
     window.api.onUpdateProgress((p) => {
-      console.log(p)
+      setProgress(p)
+      setStatus("downloading")
     })
     window.api.onUpdateDownloaded(() => {
-      setIsDownload({
-        ...isDownload,
-        alreadyDownload : true
-      })
+      setStatus("downloaded")
     })
 
     window.api.onUpdateNone(() => {
-      setIsDownload({
-        ...isDownload,
-        loading : false
-      })
       console.log("No update")
     })
   }, [])
-  if(isDownload.loading){
-    return <></>
-  }
   return (
     <>
       <div className='flex-row justify-center'>
         <h1 className='text-white'>Kiosk Project</h1>
-        <p className='text-orange-500'>version {version}</p>
-        {
-          isDownload.alreadyDownload ? <button onClick={() => window.api.installUpdate()} className='bg-orange-500 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-700 text-white font-bold py-2 px-4 rounded'>
-                Install & Restart
-              </button> : 
-          <>
-            {
-              isDownload.updateAvailable ?
-              <button onClick={() => window.api.downloadUpdate()} className='bg-orange-500 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-700 text-white font-bold py-2 px-4 rounded'>
-                Download
-              </button>:
-              <p className='text-white'>This version is latest.</p>
-            }
-          </>
-        }
+        <button className='bg-orange-500 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-700 text-white font-bold py-2 px-4 rounded' onClick={() => window.api.checkUpdate()}>
+        Check update
+      </button>
+
+      {status === "available" && (
+        <button className='bg-orange-500 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-700 text-white font-bold py-2 px-4 rounded' onClick={() => window.api.downloadUpdate()}>
+          Download v{ver}
+        </button>
+      )}
+
+      {status === "downloading" && (
+        <p className='text-white'>Downloading… {progress}%</p>
+      )}
+
+      {status === "downloaded" && (
+        <button className='bg-orange-500 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-700 text-white font-bold py-2 px-4 rounded' onClick={() => window.api.installUpdate()}>
+          Install & Restart
+        </button>
+      )}
       </div>
     </>
   )
