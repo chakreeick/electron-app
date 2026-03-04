@@ -30,14 +30,11 @@ function App() {
   }, [])
   return (
     <>
-      <div className='flex-row justify-center'>
-        <h1 className='text-white'>Kiosk Project</h1>
-        <button className='bg-orange-500 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-700 text-white font-bold py-2 px-4 rounded' onClick={() => window.api.checkUpdate()}>
-        Check update
-      </button>
-
+      <div className='flex flex-col items-center justify-center h-screen gap-4'>
+      <h1 className='text-white'>Kiosk Project</h1>
+      <p className='text-orange-500'>Version : {ver}</p>
       {status === "available" && (
-        <button className='bg-orange-500 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-700 text-white font-bold py-2 px-4 rounded' onClick={() => window.api.downloadUpdate()}>
+        <button type='button' className='bg-orange-500 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-700 text-white font-bold py-2 px-4 rounded' onClick={() => window.api.downloadUpdate()}>
           Download v{ver}
         </button>
       )}
@@ -47,7 +44,7 @@ function App() {
       )}
 
       {status === "downloaded" && (
-        <button className='bg-orange-500 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-700 text-white font-bold py-2 px-4 rounded' onClick={() => window.api.installUpdate()}>
+        <button type='button' className='bg-orange-500 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-700 text-white font-bold py-2 px-4 rounded' onClick={() => window.api.installUpdate()}>
           Install & Restart
         </button>
       )}
